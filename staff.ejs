@@ -1,0 +1,144 @@
+<style>
+  body {
+    background: #1a1108;
+    color: #ede0c8;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  .container {
+    padding: 30px;
+  }
+
+  .title {
+    font-size: 26px;
+    margin-bottom: 20px;
+  }
+
+  .form {
+    margin-bottom: 20px;
+    display: flex;
+    gap: 10px;
+  }
+
+  .input {
+    padding: 8px;
+    border-radius: 6px;
+    border: none;
+    background: #3d2d18;
+    color: white;
+  }
+
+  .btn {
+    padding: 8px 15px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    background: #c9963a;
+    color: #1a1108;
+    font-weight: 600;
+  }
+
+  .table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #2a1e0e;
+    border-radius: 12px;
+  }
+
+  th, td {
+    padding: 14px;
+    text-align: left;
+  }
+
+  th {
+    color: #8a7660;
+    font-size: 12px;
+    border-bottom: 1px solid #3d2d18;
+  }
+
+  tr:hover {
+    background: #231a0d;
+  }
+
+  .status {
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+  }
+
+  .on { background: rgba(90,138,74,.2); color: #7ec96e; }
+  .break { background: rgba(201,150,58,.2); color: #e8b86d; }
+
+</style>
+
+<div class="container">
+
+  <h1 class="title">👨‍🍳 Staff Management</h1>
+
+  <!-- ADD STAFF -->
+  <form action="/admin/add-staff" method="POST" class="form">
+    <input type="text" name="name" placeholder="Name" class="input" required>
+    <input type="text" name="role" placeholder="Role (Chef, Cashier)" class="input" required>
+
+    <button class="btn">Add Staff</button>
+  </form>
+
+  <!-- STAFF TABLE -->
+  <table class="table">
+
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Role</th>
+        <th>Status</th>
+        <th>Update</th>
+        <th>Delete</th>
+      </tr>
+    </thead>
+
+    <tbody>
+
+      <% staff.forEach(member => { %>
+
+        <tr>
+
+          <td><%= member.name %></td>
+          <td><%= member.role %></td>
+
+          <td>
+            <span class="status <%= member.status === 'On duty' ? 'on' : 'break' %>">
+              <%= member.status %>
+            </span>
+          </td>
+
+          <!-- UPDATE STATUS -->
+          <td>
+            <form action="/admin/update-staff" method="POST">
+              <input type="hidden" name="id" value="<%= member.id %>">
+
+              <select name="status" class="input">
+                <option>On duty</option>
+                <option>Break</option>
+              </select>
+
+              <button class="btn">Update</button>
+            </form>
+          </td>
+
+          <!-- DELETE -->
+          <td>
+            <form action="/admin/delete-staff" method="POST">
+              <input type="hidden" name="id" value="<%= member.id %>">
+              <button class="btn" style="background:#a04030; color:white;">Delete</button>
+            </form>
+          </td>
+
+        </tr>
+
+      <% }) %>
+
+    </tbody>
+
+  </table>
+
+</div>

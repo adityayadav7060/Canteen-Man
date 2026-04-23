@@ -1,0 +1,130 @@
+<style>
+  body {
+    background: #1a1108;
+    color: #ede0c8;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  .container {
+    padding: 30px;
+  }
+
+  .title {
+    font-size: 26px;
+    margin-bottom: 20px;
+  }
+
+  .add-btn {
+    padding: 10px 18px;
+    background: #c9963a;
+    color: #1a1108;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-bottom: 20px;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+  }
+
+  .card {
+    background: #2a1e0e;
+    border-radius: 12px;
+    padding: 15px;
+    border: 1px solid #3d2d18;
+  }
+
+  .card img {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 10px;
+  }
+
+  .name {
+    font-size: 16px;
+    margin-top: 10px;
+    font-weight: 600;
+  }
+
+  .price {
+    color: #e8b86d;
+    font-weight: bold;
+    margin-top: 5px;
+  }
+
+  .category {
+    font-size: 12px;
+    color: #8a7660;
+  }
+
+  .stock {
+    font-size: 12px;
+    margin-top: 5px;
+  }
+
+  .actions {
+    margin-top: 10px;
+    display: flex;
+    gap: 10px;
+  }
+
+  .btn {
+    flex: 1;
+    padding: 6px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+
+  .edit {
+    background: #5a8a4a;
+    color: white;
+  }
+
+  .delete {
+    background: #a04030;
+    color: white;
+  }
+</style>
+
+<div class="container">
+
+  <h1 class="title">🍱 Menu Items</h1>
+
+  <button class="add-btn" onclick="window.location.href='/Additems'">
+    ➕ Add New Item
+  </button>
+
+  <div class="grid">
+
+    <% items.forEach(item => { %>
+
+      <div class="card">
+
+        <img src="/uploads/<%= item.image %>">
+
+        <div class="name"><%= item.item_name %></div>
+        <div class="price">₹ <%= item.price %></div>
+        <div class="category"><%= item.category %></div>
+        <div class="stock">Stock: <%= item.stock_limit %></div>
+
+        <div class="actions">
+
+          <form action="/admin/delete-item" method="POST">
+            <input type="hidden" name="id" value="<%= item.id %>">
+            <button class="btn delete">Delete</button>
+          </form>
+
+        </div>
+
+      </div>
+
+    <% }) %>
+
+  </div>
+
+</div>

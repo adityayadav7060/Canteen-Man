@@ -1,0 +1,132 @@
+<style>
+  body {
+    background: #1a1108;
+    color: #ede0c8;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  .container {
+    padding: 30px;
+  }
+
+  .title {
+    font-size: 26px;
+    margin-bottom: 20px;
+  }
+
+  .table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #2a1e0e;
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  th, td {
+    padding: 14px;
+    text-align: left;
+  }
+
+  th {
+    color: #8a7660;
+    font-size: 12px;
+    text-transform: uppercase;
+    border-bottom: 1px solid #3d2d18;
+  }
+
+  td {
+    border-bottom: 1px solid rgba(61,45,24,.5);
+  }
+
+  tr:hover {
+    background: #231a0d;
+  }
+
+  .low-stock {
+    color: #e07060;
+    font-weight: bold;
+  }
+
+  .good-stock {
+    color: #7ec96e;
+    font-weight: bold;
+  }
+
+  .update-form {
+    display: flex;
+    gap: 5px;
+  }
+
+  .input {
+    width: 60px;
+    padding: 5px;
+    border-radius: 6px;
+    border: none;
+    background: #3d2d18;
+    color: white;
+  }
+
+  .btn {
+    padding: 5px 10px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+
+  .update {
+    background: #c9963a;
+    color: #1a1108;
+  }
+</style>
+
+<div class="container">
+
+  <h1 class="title">📦 Inventory Management</h1>
+
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Item</th>
+        <th>Category</th>
+        <th>Price</th>
+        <th>Stock</th>
+        <th>Update</th>
+      </tr>
+    </thead>
+
+    <tbody>
+
+      <% items.forEach(item => { %>
+
+        <tr>
+
+          <td><%= item.item_name %></td>
+          <td><%= item.category %></td>
+          <td>₹ <%= item.price %></td>
+
+          <td>
+            <% if(item.stock_limit <= 5) { %>
+              <span class="low-stock">⚠ <%= item.stock_limit %></span>
+            <% } else { %>
+              <span class="good-stock"><%= item.stock_limit %></span>
+            <% } %>
+          </td>
+
+          <td>
+            <form action="/admin/update-stock" method="POST" class="update-form">
+              <input type="hidden" name="id" value="<%= item.id %>">
+
+              <input type="number" name="stock" class="input" required>
+
+              <button class="btn update">Update</button>
+            </form>
+          </td>
+
+        </tr>
+
+      <% }) %>
+
+    </tbody>
+  </table>
+
+</div>

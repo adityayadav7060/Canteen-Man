@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Order Payment – Grill Restaurant</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --green: #2e7d32;
+    --green-light: #4caf50;
+    --green-pale: #e8f5e9;
+    --bg: #f0f4f0;
+    --card: #ffffff;
+    --text: #1a1a1a;
+    --muted: #757575;
+    --border: #e0e0e0;
+  }
+ 
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+ 
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    min-height: 100vh;
+    display: flex;
+  }
+ 
+  /* ── Sidebar ── */
+  .sidebar {
+    width: 68px;
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 18px 0;
+    gap: 8px;
+    box-shadow: 2px 0 8px rgba(0,0,0,.06);
+    position: fixed;
+    top: 0; left: 0; bottom: 0;
+    z-index: 10;
+  }
+  .sidebar .logo {
+    width: 38px; height: 38px;
+    background: var(--green);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+    margin-bottom: 12px;
+  }
+  .nav-item {
+    width: 44px; height: 44px;
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+    color: var(--muted);
+  }
+  .nav-item.active { background: var(--green); color: #fff; }
+  .sidebar-bot { margin-top: auto; }
+ 
+  /* ── Main ── */
+  .main {
+    margin-left: 68px;
+    flex: 1;
+    padding: 32px 28px;
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+    align-items: flex-start;
+  }
+ 
+  /* ── Order Card ── */
+  .order-card {
+    background: var(--card);
+    border-radius: 20px;
+    box-shadow: 0 4px 20px rgba(0,0,0,.07);
+    overflow: hidden;
+    width: 230px;
+    flex-shrink: 0;
+  }
+  .order-card img { width: 100%; height: 140px; object-fit: cover; display: block; }
+  .order-info { padding: 14px 16px 18px; }
+  .order-meta { display: flex; justify-content: space-between; align-items: center; }
+  .order-info .name { font-weight: 600; font-size: 15px; }
+  .order-info .price { font-size: 17px; font-weight: 700; color: var(--green); }
+  .qty-row {
+    display: flex; align-items: center;
+    gap: 10px; margin-top: 12px;
+    font-size: 14px; color: var(--muted);
+  }
+  .qty-val {
+    background: var(--green-pale); color: var(--green);
+    font-weight: 700; padding: 4px 12px;
+    border-radius: 8px; font-size: 15px;
+  }
+ 
+  /* ── Bill Card ── */
+  .bill-card {
+    background: var(--card);
+    border-radius: 20px;
+    padding: 20px 22px;
+    box-shadow: 0 4px 20px rgba(0,0,0,.06);
+    width: 230px;
+  }
+  .section-label {
+    font-size: 11px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 1px;
+    color: var(--muted); margin-bottom: 10px;
+  }
+  .bill-row {
+    display: flex; justify-content: space-between;
+    font-size: 14px; color: var(--muted); padding: 5px 0;
+  }
+  .bill-row.total {
+    border-top: 1.5px dashed var(--border);
+    margin-top: 8px; padding-top: 12px;
+    font-size: 16px; font-weight: 700; color: var(--text);
+  }
+  .bill-row.total span:last-child { color: var(--green); }
+ 
+  /* ── Payment Section ── */
+  .payment-section {
+    flex: 1; min-width: 300px;
+    display: flex; flex-direction: column; gap: 22px;
+  }
+  h2 { font-family: 'Playfair Display', serif; font-size: 26px; color: var(--text); }
+  h2 span { color: var(--green); }
+ 
+  /* ── Hide all radio inputs ── */
+  input[type="radio"] { display: none; }
+ 
+  /* ── Method pills ── */
+  .methods-grid { display: flex; gap: 12px; flex-wrap: wrap; }
+  .method-pill {
+    display: flex; align-items: center; gap: 9px;
+    padding: 10px 18px; border-radius: 50px;
+    border: 2px solid var(--border);
+    cursor: pointer; font-weight: 500; font-size: 14px;
+    background: #fff;
+    transition: border-color .2s, background .2s, transform .15s;
+    user-select: none;
+  }
+  .method-pill:hover { transform: translateY(-2px); border-color: var(--green-light); }
+  .pip {
+    width: 14px; height: 14px; border-radius: 50%;
+    border: 2px solid #ccc; flex-shrink: 0; transition: all .2s;
+  }
+ 
+  /* Checked state for method pills */
+  #m-cash:checked   ~ .main .payment-section label[for="m-cash"],
+  #m-upi:checked    ~ .main .payment-section label[for="m-upi"],
+  #m-qr:checked     ~ .main .payment-section label[for="m-qr"] {
+    border-color: var(--green); background: var(--green-pale); color: var(--green);
+  }
+  #m-cash:checked   ~ .main .payment-section label[for="m-cash"] .pip,
+  #m-upi:checked    ~ .main .payment-section label[for="m-upi"]  .pip,
+  #m-qr:checked     ~ .main .payment-section label[for="m-qr"]   .pip {
+    border-color: var(--green); background: var(--green);
+  }
+ 
+  /* ── UPI sub-row ── */
+  .upi-row { display: none; flex-direction: column; gap: 10px; }
+  #m-upi:checked ~ .main .payment-section .upi-row { display: flex; }
+ 
+  .upi-apps { display: flex; gap: 12px; flex-wrap: wrap; }
+  .upi-app {
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
+    padding: 12px 18px; border-radius: 16px;
+    border: 2px solid var(--border);
+    cursor: pointer; font-size: 12px; font-weight: 600;
+    background: #fff; transition: all .2s;
+  }
+  .upi-app:hover { transform: translateY(-3px); box-shadow: 0 6px 18px rgba(0,0,0,.1); }
+  .upi-icon { font-size: 26px; }
+ 
+  /* UPI app checked states */
+  #u-paytm:checked   ~ .main .payment-section label[for="u-paytm"]   { background: #002970; color: #fff; border-color: transparent; }
+  #u-phonepe:checked ~ .main .payment-section label[for="u-phonepe"] { background: #5f259f; color: #fff; border-color: transparent; }
+  #u-gpay:checked    ~ .main .payment-section label[for="u-gpay"]    { background: #4285f4; color: #fff; border-color: transparent; }
+ 
+  /* ── QR Block ── */
+  .qr-block {
+    display: none;
+    flex-direction: column; align-items: center; gap: 12px;
+    background: var(--card); border-radius: 20px;
+    padding: 22px; box-shadow: 0 4px 20px rgba(0,0,0,.06);
+    align-self: flex-start;
+  }
+  #m-qr:checked ~ .main .payment-section .qr-block { display: flex; }
+ 
+  .qr-title { font-weight: 600; font-size: 14px; color: var(--text); }
+  .qr-amount {
+    font-size: 22px; font-family: 'Playfair Display', serif;
+    font-weight: 700; color: var(--green);
+  }
+  .qr-sub { font-size: 11px; color: var(--muted); text-align: center; line-height: 1.6; }
+ 
+  /* ── Place Order button ── */
+  .pay-btn {
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    background: var(--green); color: #fff;
+    border-radius: 16px; padding: 16px 32px;
+    font-size: 16px; font-weight: 600;
+    cursor: pointer; width: 100%;
+    font-family: 'DM Sans', sans-serif;
+    box-shadow: 0 6px 20px rgba(46,125,50,.35);
+    transition: background .2s, transform .15s, box-shadow .2s;
+    text-decoration: none;
+  }
+  .pay-btn:hover {
+    background: #1b5e20;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 28px rgba(46,125,50,.45);
+  }
+</style>
+</head>
+<body>
+ 
+<!-- Radio inputs must be siblings (before) .main for the ~ selector to work -->
+<input type="radio" name="method" id="m-cash">
+<input type="radio" name="method" id="m-upi">
+<input type="radio" name="method" id="m-qr">
+<input type="radio" name="upi" id="u-paytm">
+<input type="radio" name="upi" id="u-phonepe">
+<input type="radio" name="upi" id="u-gpay">
+ 
+<!-- Sidebar -->
+<div class="sidebar">
+  <div class="logo">🍽️</div>
+  <div class="nav-item active">🍴</div>
+  <div class="nav-item">🏠</div>
+  <div class="nav-item">⊞</div>
+  <div class="nav-item">🕐</div>
+  <div class="sidebar-bot">
+    <div class="nav-item">⚙️</div>
+    <div class="nav-item" style="color:#e53935;">🚀</div>
+  </div>
+</div>
+ 
+<!-- Main -->
+<div class="main">
+ 
+  <!-- Left column -->
+  <div style="display:flex; flex-direction:column; gap:16px;">
+ 
+    <!-- Order card -->
+    <div class="order-card">
+      <img src="/mnt/user-data/uploads/1774373893336_image.png" alt="Food">
+      <div class="order-info">
+        <div class="order-meta">
+          <span class="name">Food</span>
+          <span class="price">₹ 50.00</span>
+        </div>
+        <div class="qty-row">
+          Qty: <span class="qty-val">1</span>
+        </div>
+      </div>
+    </div>
+ 
+    <!-- Bill summary -->
+    <div class="bill-card">
+      <div class="section-label">Bill Summary</div>
+      <div class="bill-row"><span>Item Total</span><span>₹ 50.00</span></div>
+      <div class="bill-row"><span>GST (5%)</span><span>₹ 2.50</span></div>
+      <div class="bill-row"><span>Delivery</span><span style="color:var(--green);">Free</span></div>
+      <div class="bill-row total"><span>To Pay</span><span>₹ 52.50</span></div>
+    </div>
+  </div>
+ 
+  <!-- Right: Payment -->
+  <div class="payment-section">
+    <h2>Choose <span>Payment</span></h2>
+ 
+    <!-- Method selection -->
+    <div>
+      <div class="section-label">Payment Method</div>
+      <div class="methods-grid">
+        <label class="method-pill" for="m-cash">
+          <span class="pip"></span>💵 Cash on Delivery
+        </label>
+        <label class="method-pill" for="m-upi">
+          <span class="pip"></span>📲 UPI
+        </label>
+        <label class="method-pill" for="m-qr">
+          <span class="pip"></span>📷 Scan &amp; Pay (QR)
+        </label>
+      </div>
+    </div>
+ 
+    <!-- UPI sub-options (shown via CSS when m-upi is checked) -->
+    <div class="upi-row">
+      <div class="section-label">Select UPI App</div>
+      <div class="upi-apps">
+        <label class="upi-app" for="u-paytm">
+          <span class="upi-icon">💙</span>Paytm
+        </label>
+        <label class="upi-app" for="u-phonepe">
+          <span class="upi-icon">💜</span>PhonePe
+        </label>
+        <label class="upi-app" for="u-gpay">
+          <span class="upi-icon">🔵</span>GPay
+        </label>
+      </div>
+    </div>
+ 
+    <!-- QR Code block (shown via CSS when m-qr is checked) -->
+    <div class="qr-block">
+      <div class="qr-title">📷 Scan to Pay</div>
+      <svg width="160" height="160" viewBox="0 0 160 160" xmlns="http://www.w3.org/2000/svg">
+        <rect width="160" height="160" rx="14" fill="white" stroke="#2e7d32" stroke-width="3"/>
+        <!-- Top-left finder -->
+        <rect x="12" y="12" width="40" height="40" rx="5" fill="none" stroke="#111" stroke-width="3"/>
+        <rect x="20" y="20" width="24" height="24" rx="2" fill="#111"/>
+        <!-- Top-right finder -->
+        <rect x="108" y="12" width="40" height="40" rx="5" fill="none" stroke="#111" stroke-width="3"/>
+        <rect x="116" y="20" width="24" height="24" rx="2" fill="#111"/>
+        <!-- Bottom-left finder -->
+        <rect x="12" y="108" width="40" height="40" rx="5" fill="none" stroke="#111" stroke-width="3"/>
+        <rect x="20" y="116" width="24" height="24" rx="2" fill="#111"/>
+        <!-- Data modules -->
+        <rect x="58" y="12" width="6" height="6" fill="#111"/>
+        <rect x="68" y="12" width="6" height="6" fill="#111"/>
+        <rect x="84" y="12" width="6" height="6" fill="#111"/>
+        <rect x="96" y="12" width="6" height="6" fill="#111"/>
+        <rect x="58" y="22" width="6" height="6" fill="#111"/>
+        <rect x="78" y="22" width="6" height="6" fill="#111"/>
+        <rect x="96" y="22" width="6" height="6" fill="#111"/>
+        <rect x="58" y="32" width="6" height="6" fill="#111"/>
+        <rect x="68" y="32" width="6" height="6" fill="#111"/>
+        <rect x="84" y="32" width="6" height="6" fill="#111"/>
+        <rect x="58" y="42" width="6" height="6" fill="#111"/>
+        <rect x="78" y="42" width="6" height="6" fill="#111"/>
+        <rect x="88" y="42" width="6" height="6" fill="#111"/>
+        <rect x="12" y="58" width="6" height="6" fill="#111"/>
+        <rect x="22" y="58" width="6" height="6" fill="#111"/>
+        <rect x="42" y="58" width="6" height="6" fill="#111"/>
+        <rect x="58" y="58" width="6" height="6" fill="#111"/>
+        <rect x="72" y="58" width="6" height="6" fill="#111"/>
+        <rect x="88" y="58" width="6" height="6" fill="#111"/>
+        <rect x="102" y="58" width="6" height="6" fill="#111"/>
+        <rect x="118" y="58" width="6" height="6" fill="#111"/>
+        <rect x="132" y="58" width="6" height="6" fill="#111"/>
+        <rect x="146" y="58" width="6" height="6" fill="#111"/>
+        <rect x="12" y="68" width="6" height="6" fill="#111"/>
+        <rect x="32" y="68" width="6" height="6" fill="#111"/>
+        <rect x="58" y="68" width="6" height="6" fill="#111"/>
+        <rect x="78" y="68" width="6" height="6" fill="#111"/>
+        <rect x="98" y="68" width="6" height="6" fill="#111"/>
+        <rect x="112" y="68" width="6" height="6" fill="#111"/>
+        <rect x="132" y="68" width="6" height="6" fill="#111"/>
+        <rect x="148" y="68" width="6" height="6" fill="#111"/>
+        <rect x="12" y="78" width="6" height="6" fill="#111"/>
+        <rect x="22" y="78" width="6" height="6" fill="#111"/>
+        <rect x="42" y="78" width="6" height="6" fill="#111"/>
+        <rect x="62" y="78" width="6" height="6" fill="#111"/>
+        <rect x="78" y="78" width="6" height="6" fill="#111"/>
+        <rect x="92" y="78" width="6" height="6" fill="#111"/>
+        <rect x="108" y="78" width="6" height="6" fill="#111"/>
+        <rect x="128" y="78" width="6" height="6" fill="#111"/>
+        <rect x="142" y="78" width="6" height="6" fill="#111"/>
+        <rect x="12" y="88" width="6" height="6" fill="#111"/>
+        <rect x="32" y="88" width="6" height="6" fill="#111"/>
+        <rect x="52" y="88" width="6" height="6" fill="#111"/>
+        <rect x="68" y="88" width="6" height="6" fill="#111"/>
+        <rect x="88" y="88" width="6" height="6" fill="#111"/>
+        <rect x="108" y="88" width="6" height="6" fill="#111"/>
+        <rect x="128" y="88" width="6" height="6" fill="#111"/>
+        <rect x="148" y="88" width="6" height="6" fill="#111"/>
+        <rect x="58" y="98" width="6" height="6" fill="#111"/>
+        <rect x="72" y="98" width="6" height="6" fill="#111"/>
+        <rect x="88" y="98" width="6" height="6" fill="#111"/>
+        <rect x="102" y="98" width="6" height="6" fill="#111"/>
+        <rect x="118" y="98" width="6" height="6" fill="#111"/>
+        <rect x="132" y="98" width="6" height="6" fill="#111"/>
+        <rect x="148" y="98" width="6" height="6" fill="#111"/>
+        <rect x="58" y="108" width="6" height="6" fill="#111"/>
+        <rect x="72" y="108" width="6" height="6" fill="#111"/>
+        <rect x="88" y="108" width="6" height="6" fill="#111"/>
+        <rect x="108" y="108" width="6" height="6" fill="#111"/>
+        <rect x="128" y="108" width="6" height="6" fill="#111"/>
+        <rect x="148" y="108" width="6" height="6" fill="#111"/>
+        <rect x="58" y="118" width="6" height="6" fill="#111"/>
+        <rect x="78" y="118" width="6" height="6" fill="#111"/>
+        <rect x="98" y="118" width="6" height="6" fill="#111"/>
+        <rect x="118" y="118" width="6" height="6" fill="#111"/>
+        <rect x="138" y="118" width="6" height="6" fill="#111"/>
+        <rect x="58" y="128" width="6" height="6" fill="#111"/>
+        <rect x="68" y="128" width="6" height="6" fill="#111"/>
+        <rect x="88" y="128" width="6" height="6" fill="#111"/>
+        <rect x="108" y="128" width="6" height="6" fill="#111"/>
+        <rect x="128" y="128" width="6" height="6" fill="#111"/>
+        <rect x="148" y="128" width="6" height="6" fill="#111"/>
+        <rect x="58" y="138" width="6" height="6" fill="#111"/>
+        <rect x="78" y="138" width="6" height="6" fill="#111"/>
+        <rect x="98" y="138" width="6" height="6" fill="#111"/>
+        <rect x="118" y="138" width="6" height="6" fill="#111"/>
+        <rect x="138" y="138" width="6" height="6" fill="#111"/>
+        <!-- Centre logo -->
+        <rect x="68" y="68" width="24" height="24" rx="6" fill="#2e7d32"/>
+        <text x="80" y="85" text-anchor="middle" font-size="14" fill="white">🍽</text>
+      </svg>
+      <div class="qr-amount">₹ 52.50</div>
+      <div class="qr-sub">Scan with any UPI app<br>Paytm · PhonePe · GPay · BHIM</div>
+    </div>
+ 
+    <!-- Place Order -->
+    <button class="pay-btn" onclick="placeOrder()">✅ &nbsp;Place Order &nbsp;·&nbsp; ₹ 52.50</a>
+  </div>
+ 
+</div>
+<script>
+async function placeOrder() {
+  const method = document.querySelector('input[name="method"]:checked')?.id;
+
+  const res = await fetch("/place-order", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      paymentMethod: method || "cash"
+    })
+  });
+
+  const data = await res.text();
+  alert(data);
+
+  window.location.href = "/"; // redirect after order
+}
+</script>
+
+</body>
+</html>
+ 
