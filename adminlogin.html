@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Foodeiblog — Admin Login</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+ 
+/* ═══════════════════════════════
+   ROOT
+═══════════════════════════════ */
+:root {
+  --cream:     #faf7f2;
+  --cream2:    #f2ece0;
+  --cream3:    #e8dece;
+  --parchment: #ddd0bc;
+  --espresso:  #2c1a0e;
+  --brown:     #5c3d2e;
+  --brown-l:   #7a5545;
+  --olive:     #6b7c4a;
+  --olive-l:   #8fa660;
+  --rust:      #c0622f;
+  --gold:      #c49a3c;
+  --gold-l:    #d4b05a;
+  --text:      #2c1a0e;
+  --text-m:    #7a6255;
+  --text-d:    #b5a090;
+  --border:    #ddd0bc;
+  --border-l:  #ece4d8;
+  --shadow:    0 2px 24px rgba(92,61,46,.10);
+  --shadow-lg: 0 16px 60px rgba(44,26,14,.18);
+}
+ 
+*, *::before, *::after { box-sizing: border-box; margin:0; padding:0; }
+ 
+body {
+  font-family: 'Outfit', sans-serif;
+  background: var(--espresso);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  overflow: hidden;
+}
+ 
+/* ═══════════════════════════════
+   LEFT PANEL — VISUAL / BRAND
+═══════════════════════════════ */
+.left-panel {
+  flex: 1;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 48px 52px;
+  overflow: hidden;
+}
+ 
+/* layered background */
+.left-panel::before {
+  content:'';
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 70% 60% at 30% 40%, rgba(196,154,60,.18) 0%, transparent 65%),
+    radial-gradient(ellipse 55% 50% at 80% 80%, rgba(107,124,74,.14) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 45% at 10% 90%, rgba(192,98,47,.12) 0%, transparent 55%);
+  pointer-events: none;
+}
+ 
+/* grain texture */
+.left-panel::after {
+  content:'';
+  position: absolute; inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.72' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='.05'/%3E%3C/svg%3E");
+  pointer-events: none; opacity: .7;
+}
+ 
+/* decorative circles */
+.deco-circle {
+  position: absolute;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,.06);
+}
+ 
+.dc1 { width:500px;height:500px; top:-120px; left:-120px; }
+.dc2 { width:340px;height:340px; top:60px;   left:60px;   border-color:rgba(196,154,60,.1); }
+.dc3 { width:220px;height:220px; bottom:60px;right:-60px; border-color:rgba(107,124,74,.12); }
+.dc4 { width:400px;height:400px; bottom:-150px;right:-100px; }
+ 
+/* top logo area */
+.panel-logo {
+  position: relative; z-index: 2;
+  display: flex; align-items: center; gap: 14px;
+}
+ 
+.logo-leaf {
+  width: 50px; height: 50px;
+  background: linear-gradient(135deg, var(--olive), var(--olive-l));
+  border-radius: 50% 14px 50% 14px;
+  display: grid; place-items: center;
+  font-size: 24px;
+  box-shadow: 0 6px 24px rgba(107,124,74,.45);
+  flex-shrink: 0;
+}
+ 
+.logo-name {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--cream);
+  line-height: 1;
+}
+.logo-name em { font-style: italic; color: var(--gold-l); }
+ 
+.logo-tag {
+  font-size: 11px;
+  color: rgba(255,255,255,.35);
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  font-weight: 500;
+  margin-top: 3px;
+}
+ 
+/* big center hero text */
+.panel-hero {
+  position: relative; z-index: 2;
+  margin-top: auto;
+  margin-bottom: 32px;
+}
+ 
+.hero-eyebrow {
+  font-size: 11px;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--gold-l);
+  font-weight: 600;
+  margin-bottom: 14px;
+  display: flex; align-items: center; gap: 10px;
+}
+ 
+.hero-eyebrow::after {
+  content:'';
+  display: block;
+  width: 40px; height: 1px;
+  background: var(--gold-l);
+  opacity: .5;
+}
+ 
+.hero-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(38px, 5vw, 58px);
+  font-weight: 700;
+  color: var(--cream);
+  line-height: 1.08;
+  margin-bottom: 20px;
+}
+ 
+.hero-title em {
+  font-style: italic;
+  color: var(--gold-l);
+  display: block;
+}
+ 
+.hero-desc {
+  font-size: 14.5px;
+  color: rgba(255,255,255,.45);
+  line-height: 1.7;
+  max-width: 340px;
+  font-weight: 300;
+}
+ 
+/* floating food cards */
+.food-badges {
+  position: relative; z-index: 2;
+  display: flex; gap: 12px; flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+ 
+.food-badge {
+  display: flex; align-items: center; gap: 8px;
+  padding: 9px 16px;
+  border-radius: 40px;
+  background: rgba(255,255,255,.07);
+  border: 1px solid rgba(255,255,255,.1);
+  backdrop-filter: blur(8px);
+  font-size: 13px; color: rgba(255,255,255,.7);
+  font-weight: 500;
+  animation: floatIn 0.6s ease both;
+}
+ 
+.food-badge:nth-child(1){animation-delay:.1s}
+.food-badge:nth-child(2){animation-delay:.2s}
+.food-badge:nth-child(3){animation-delay:.3s}
+ 
+@keyframes floatIn {
+  from{opacity:0;transform:translateY(14px)}
+  to  {opacity:1;transform:translateY(0)}
+}
+ 
+.fb-icon { font-size: 16px; }
+ 
+/* stat strip */
+.stat-strip {
+  position: relative; z-index: 2;
+  display: flex; gap: 32px;
+  padding-top: 24px;
+  border-top: 1px solid rgba(255,255,255,.1);
+}
+ 
+.stat-item {}
+.stat-val {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 26px; font-weight: 700;
+  color: var(--cream); line-height: 1;
+}
+.stat-lbl { font-size: 11px; color: rgba(255,255,255,.35); margin-top:3px; font-weight:400; }
+ 
+/* ═══════════════════════════════
+   RIGHT PANEL — LOGIN FORM
+═══════════════════════════════ */
+.right-panel {
+  width: 480px;
+  flex-shrink: 0;
+  background: var(--cream);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  padding: 48px 52px;
+  overflow-y: auto;
+}
+ 
+/* subtle top accent bar */
+.right-panel::before {
+  content:'';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--olive), var(--gold), var(--rust));
+}
+ 
+.form-wrap {
+  width: 100%;
+  max-width: 360px;
+  animation: slideUp .55s cubic-bezier(.22,1,.36,1) both;
+}
+ 
+@keyframes slideUp {
+  from { opacity:0; transform:translateY(28px) }
+  to   { opacity:1; transform:translateY(0) }
+}
+ 
+/* form top */
+.form-top {
+  margin-bottom: 38px;
+}
+ 
+.form-greeting {
+  font-size: 12px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--olive);
+  font-weight: 700;
+  margin-bottom: 10px;
+  display: flex; align-items: center; gap: 8px;
+}
+ 
+.form-greeting::before {
+  content: '';
+  display: block;
+  width: 24px; height: 2px;
+  background: var(--olive);
+  border-radius: 2px;
+}
+ 
+.form-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 36px;
+  font-weight: 700;
+  color: var(--espresso);
+  line-height: 1.1;
+  margin-bottom: 8px;
+}
+ 
+.form-sub {
+  font-size: 13.5px;
+  color: var(--text-m);
+  line-height: 1.6;
+}
+ 
+/* avatar */
+.admin-ava-wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: var(--cream2);
+  border: 1.5px solid var(--border);
+  margin-bottom: 28px;
+  cursor: pointer;
+  transition: border-color .2s;
+}
+.admin-ava-wrap:hover { border-color: var(--olive); }
+ 
+.admin-ava {
+  width: 42px; height: 42px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--rust), var(--gold));
+  display: grid; place-items: center;
+  font-size: 16px; font-weight: 700;
+  color: #fff; flex-shrink: 0;
+}
+ 
+.admin-ava-info {}
+.admin-ava-name { font-size: 14px; font-weight: 600; color: var(--espresso); }
+.admin-ava-role { font-size: 11px; color: var(--text-d); }
+ 
+.switch-acc {
+  margin-left: auto;
+  font-size: 11px;
+  color: var(--olive);
+  font-weight: 600;
+  cursor: pointer;
+  padding: 4px 10px;
+  border-radius: 6px;
+  border: 1px solid rgba(107,124,74,.25);
+  background: rgba(107,124,74,.06);
+  transition: background .18s;
+}
+.switch-acc:hover { background: rgba(107,124,74,.14); }
+ 
+/* fields */
+.field-group { display: flex; flex-direction: column; gap: 16px; margin-bottom: 24px; }
+ 
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+ 
+.field label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--espresso);
+  letter-spacing: .03em;
+  text-transform: uppercase;
+}
+ 
+.input-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #fff;
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  padding: 13px 16px;
+  transition: border-color .2s, box-shadow .2s;
+  position: relative;
+}
+ 
+.input-wrap:focus-within {
+  border-color: var(--olive);
+  box-shadow: 0 0 0 4px rgba(107,124,74,.1);
+}
+ 
+.input-wrap.error {
+  border-color: var(--rust);
+  box-shadow: 0 0 0 4px rgba(192,98,47,.08);
+}
+ 
+.input-ico { font-size: 16px; flex-shrink: 0; color: var(--text-d); }
+ 
+.input-wrap input {
+  flex: 1;
+  border: none; outline: none;
+  font-size: 14px;
+  color: var(--espresso);
+  font-family: 'Outfit', sans-serif;
+  background: transparent;
+}
+ 
+.input-wrap input::placeholder { color: var(--text-d); }
+ 
+.pw-toggle {
+  cursor: pointer;
+  font-size: 15px;
+  color: var(--text-d);
+  transition: color .18s;
+  user-select: none;
+  flex-shrink: 0;
+}
+.pw-toggle:hover { color: var(--olive); }
+ 
+.field-error {
+  font-size: 11.5px;
+  color: var(--rust);
+  font-weight: 500;
+  display: none;
+  align-items: center;
+  gap: 5px;
+}
+ 
+.field-error.show { display: flex; }
+ 
+/* options row */
+.options-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 26px;
+}
+ 
+/* custom checkbox */
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--text-m);
+  font-weight: 500;
+  user-select: none;
+}
+ 
+.custom-check {
+  width: 18px; height: 18px;
+  border-radius: 5px;
+  border: 1.5px solid var(--border);
+  background: #fff;
+  display: grid; place-items: center;
+  flex-shrink: 0;
+  transition: all .18s;
+  position: relative;
+}
+ 
+.checkbox-label input { display: none; }
+ 
+.checkbox-label input:checked + .custom-check {
+  background: var(--olive);
+  border-color: var(--olive);
+}
+ 
+.custom-check::after {
+  content: '✓';
+  font-size: 11px;
+  color: #fff;
+  opacity: 0;
+  transform: scale(.6);
+  transition: all .15s;
+}
+ 
+.checkbox-label input:checked + .custom-check::after {
+  opacity: 1;
+  transform: scale(1);
+}
+ 
+.forgot-link {
+  font-size: 13px;
+  color: var(--olive);
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  transition: color .18s;
+}
+.forgot-link:hover { color: var(--rust); }
+ 
+/* submit button */
+.btn-login {
+  width: 100%;
+  padding: 15px;
+  border: none;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--espresso) 0%, var(--brown) 100%);
+  color: var(--cream);
+  font-family: 'Outfit', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  letter-spacing: .02em;
+  box-shadow: 0 6px 24px rgba(44,26,14,.28);
+  transition: all .22s;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+ 
+.btn-login::before {
+  content:'';
+  position:absolute; inset:0;
+  background: linear-gradient(135deg, rgba(255,255,255,.08), transparent);
+}
+ 
+.btn-login:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 32px rgba(44,26,14,.38);
+}
+ 
+.btn-login:active { transform: translateY(0); }
+ 
+.btn-login.loading { pointer-events: none; }
+.btn-login.loading .btn-text { opacity: 0; }
+.btn-login.loading .btn-spinner { display: flex; }
+ 
+.btn-spinner {
+  display: none;
+  position: absolute;
+  align-items: center; justify-content: center;
+}
+ 
+.spinner {
+  width: 20px; height: 20px;
+  border: 2px solid rgba(255,255,255,.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin .7s linear infinite;
+}
+ 
+@keyframes spin { to { transform: rotate(360deg); } }
+ 
+/* OR divider */
+.or-divider {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 22px 0;
+  color: var(--text-d);
+  font-size: 12px;
+}
+.or-divider::before,
+.or-divider::after {
+  content:'';
+  flex:1; height:1px;
+  background: var(--border);
+}
+ 
+/* social login */
+.social-row { display: flex; gap: 12px; }
+ 
+.social-btn {
+  flex: 1;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 11px;
+  border-radius: 10px;
+  border: 1.5px solid var(--border);
+  background: #fff;
+  cursor: pointer;
+  font-size: 13px; font-weight: 500; color: var(--espresso);
+  transition: all .2s;
+}
+.social-btn:hover {
+  border-color: var(--olive);
+  background: var(--cream2);
+  box-shadow: var(--shadow);
+}
+.social-ico { font-size: 17px; }
+ 
+/* bottom note */
+.form-footer {
+  margin-top: 28px;
+  text-align: center;
+  font-size: 12px;
+  color: var(--text-d);
+}
+ 
+.form-footer a { color: var(--olive); font-weight: 600; cursor: pointer; }
+ 
+/* success state overlay */
+.success-overlay {
+  position: absolute; inset: 0;
+  background: var(--cream);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .4s ease;
+  z-index: 10;
+}
+ 
+.success-overlay.show { opacity: 1; pointer-events: all; }
+ 
+.success-icon {
+  width: 72px; height: 72px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--olive), var(--olive-l));
+  display: grid; place-items: center;
+  font-size: 32px;
+  box-shadow: 0 8px 30px rgba(107,124,74,.35);
+  animation: popIn .5s cubic-bezier(.175,.885,.32,1.275) both;
+}
+ 
+@keyframes popIn {
+  from { transform: scale(0); }
+  to   { transform: scale(1); }
+}
+ 
+.success-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 26px; font-weight: 700; color: var(--espresso);
+}
+ 
+.success-sub { font-size: 13px; color: var(--text-m); }
+ 
+.progress-bar {
+  width: 200px; height: 3px;
+  background: var(--cream2);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-top: 8px;
+}
+ 
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--olive), var(--gold));
+  border-radius: 2px;
+  width: 0;
+  transition: width 2s linear;
+}
+ 
+/* ── Responsive ── */
+@media(max-width: 900px) {
+  .left-panel { display: none; }
+  .right-panel { width: 100%; }
+}
+</style>
+</head>
+<body>
+ 
+<!-- ═══════ LEFT PANEL ═══════ -->
+<div class="left-panel">
+  <!-- decorative circles -->
+  <div class="deco-circle dc1"></div>
+  <div class="deco-circle dc2"></div>
+  <div class="deco-circle dc3"></div>
+  <div class="deco-circle dc4"></div>
+ 
+  <!-- Logo -->
+  <div class="panel-logo">
+    <div class="logo-leaf">🌿</div>
+    <div>
+      <div class="logo-name">Foodei<em>blog</em></div>
+      <div class="logo-tag">Food · Recipes · Stories</div>
+    </div>
+  </div>
+ 
+  <!-- Hero -->
+  <div class="panel-hero">
+    <div class="hero-eyebrow">Admin Control Centre</div>
+    <div class="hero-title">
+      Every great dish<br>
+      <em>starts with a story.</em>
+    </div>
+    <div class="hero-desc">
+      Manage your recipes, blog posts, comments, and community from one beautifully crafted workspace.
+    </div>
+ 
+    <!-- food tags -->
+    <div class="food-badges" style="margin-top:28px">
+      <div class="food-badge"><span class="fb-icon">🍲</span> Recipes</div>
+      <div class="food-badge"><span class="fb-icon">✍️</span> Blog Posts</div>
+      <div class="food-badge"><span class="fb-icon">💬</span> Community</div>
+    </div>
+  </div>
+ 
+  <!-- Stat strip -->
+  <div class="stat-strip">
+    <div class="stat-item">
+      <div class="stat-val">48+</div>
+      <div class="stat-lbl">Published Posts</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-val">128K</div>
+      <div class="stat-lbl">Monthly Readers</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-val">4.8K</div>
+      <div class="stat-lbl">Subscribers</div>
+    </div>
+  </div>
+</div>
+ 
+<!-- ═══════ RIGHT PANEL ═══════ -->
+<div class="right-panel" id="rightPanel">
+ 
+  <!-- SUCCESS OVERLAY -->
+  <div class="success-overlay" id="successOverlay">
+    <div class="success-icon">✓</div>
+    <div class="success-title">Welcome back!</div>
+    <div class="success-sub">Redirecting to your dashboard…</div>
+    <div class="progress-bar">
+      <div class="progress-fill" id="progressFill"></div>
+    </div>
+  </div>
+ 
+  <!-- FORM -->
+  <div class="form-wrap">
+ 
+    <div class="form-top">
+      <div class="form-greeting">Sign In</div>
+      <div class="form-title">Welcome<br>back 👋</div>
+      <div class="form-sub">Enter your credentials to access the admin dashboard.</div>
+    </div>
+ 
+    <!-- Admin selector -->
+    <div class="admin-ava-wrap">
+      <div class="admin-ava">AK</div>
+      <div class="admin-ava-info">
+        <div class="admin-ava-name">Ananya Krishnan</div>
+        <div class="admin-ava-role">Super Administrator</div>
+      </div>
+      <div class="switch-acc">Switch</div>
+    </div>
+ 
+    <!-- FIELDS -->
+     <form action="/admin_login" method="post">
+    <div class="field-group">
+ 
+      <div class="field">
+        <label>Email Address</label>
+        <div class="input-wrap" id="emailWrap">
+          <span class="input-ico">✉️</span>
+          <input type="email" name="email" placeholder="admin@foodeiblog.com" autocomplete="email"/>
+        </div>
+        <div class="field-error" name="emailErr">⚠ Please enter a valid email address.</div>
+      </div>
+ 
+      <div class="field">
+        <label>Password</label>
+        <div class="input-wrap" id="pwWrap">
+          <span class="input-ico">🔒</span>
+          <input type="password" name="password" placeholder="Enter your password" autocomplete="current-password"/>
+          <span class="pw-toggle" id="pwToggle" title="Show/hide password">👁</span>
+        </div>
+        <div class="field-error" name="pwErr">⚠ Password must be at least 6 characters.</div>
+      </div>
+ 
+    </div>
+    <div class="options-row">
+      <label class="checkbox-label">
+        <input type="checkbox" id="rememberMe" checked/>
+        <span class="custom-check"></span>
+        Keep me signed in
+      </label>
+      <a class="forgot-link" href="#" onclick="showForgot()">Forgot password?</a>
+    </div>
+ 
+    <!-- Submit -->
+    <button class="btn-login" id="loginBtn" onclick="handleLogin()">
+      <span class="btn-text">Sign In to Dashboard &nbsp;→</span>
+      <span class="btn-spinner"><div class="spinner"></div></span>
+    </button>
+        </form>
+ 
+    
+ 
+    <!-- OR -->
+    <div class="or-divider">or continue with</div>
+ 
+    <!-- Social -->
+    <div class="social-row">
+      <div class="social-btn">
+        <span class="social-ico">🔑</span>
+        SSO
+      </div>
+      <div class="social-btn">
+        <span class="social-ico">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+            <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+            <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+            <path d="M5.84 14.1c-.22-.66-.35-1.36-.35-2.1s.13-1.44.35-2.1V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.61z" fill="#FBBC05"/>
+            <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+          </svg>
+        </span>
+        Google
+      </div>
+      <div class="social-btn">
+        <span class="social-ico">🐙</span>
+        GitHub
+      </div>
+    </div>
+ 
+    <!-- Footer note -->
+    <div class="form-footer">
+      Not an admin? <a href="#">Request access</a> &nbsp;·&nbsp;
+      <a href="#">Privacy Policy</a>
+    </div>
+ 
+  </div>
+</div>
+ 
+<!-- ═══════ FORGOT PASSWORD MODAL ═══════ -->
+<div id="forgotModal" style="
+  position:fixed;inset:0;
+  background:rgba(44,26,14,.55);
+  backdrop-filter:blur(6px);
+  display:none; place-items:center;
+  z-index:999;
+">
+  <div style="
+    background:var(--cream);
+    border-radius:20px;
+    padding:40px;
+    width:380px;
+    box-shadow:0 24px 80px rgba(44,26,14,.3);
+    animation:slideUp .35s ease both;
+  ">
+    <div style="font-size:32px;margin-bottom:14px">🔑</div>
+    <div style="font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:700;color:var(--espresso);margin-bottom:6px">Reset Password</div>
+    <div style="font-size:13px;color:var(--text-m);margin-bottom:24px;line-height:1.6">Enter the email linked to your admin account. We'll send you a reset link.</div>
+ 
+    <div style="display:flex;align-items:center;gap:10px;background:#fff;border:1.5px solid var(--border);border-radius:12px;padding:13px 16px;margin-bottom:20px">
+      <span style="font-size:16px">✉️</span>
+      <input type="email" placeholder="admin@foodeiblog.com"
+        style="flex:1;border:none;outline:none;font-size:14px;font-family:'Outfit',sans-serif;color:var(--espresso)"/>
+    </div>
+ 
+    <div style="display:flex;gap:10px">
+      <button onclick="closeForgot()" style="
+        flex:1;padding:12px;border-radius:10px;
+        border:1.5px solid var(--border);background:var(--cream2);
+        font-size:13px;font-weight:600;color:var(--text-m);
+        cursor:pointer;font-family:'Outfit',sans-serif;
+        transition:background .18s;
+      " onmouseover="this.style.background='var(--cream3)'" onmouseout="this.style.background='var(--cream2)'">
+        Cancel
+      </button>
+      <button onclick="sendReset()" style="
+        flex:1;padding:12px;border-radius:10px;
+        border:none;background:linear-gradient(135deg,var(--espresso),var(--brown));
+        font-size:13px;font-weight:600;color:var(--cream);
+        cursor:pointer;font-family:'Outfit',sans-serif;
+        box-shadow:0 4px 16px rgba(44,26,14,.25);
+        transition:transform .18s;
+      " onmouseover="this.style.transform='translateY(-1px)'" onmouseout="this.style.transform='translateY(0)'">
+        Send Reset Link
+      </button>
+    </div>
+  </div>
+</div>
+ 
+<script>
+/* ── Password toggle ── */
+const pwInput = document.getElementById('pwInput');
+const pwToggle = document.getElementById('pwToggle');
+let pwVisible = false;
+ 
+pwToggle.addEventListener('click', () => {
+  pwVisible = !pwVisible;
+  pwInput.type = pwVisible ? 'text' : 'password';
+  pwToggle.textContent = pwVisible ? '🙈' : '👁';
+});
+ 
+/* ── Validation ── */
+function validateEmail(v) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); }
+function validatePw(v)    { return v.length >= 6; }
+ 
+function setError(wrapId, errId, show) {
+  document.getElementById(wrapId).classList.toggle('error', show);
+  document.getElementById(errId).classList.toggle('show', show);
+}
+ 
+/* ── Handle Login ── */
+function handleLogin() {
+  const email = document.getElementById('emailInput').value.trim();
+  const pw    = document.getElementById('pwInput').value;
+ 
+  const emailOk = validateEmail(email);
+  const pwOk    = validatePw(pw);
+ 
+  setError('emailWrap', 'emailErr', !emailOk);
+  setError('pwWrap',    'pwErr',    !pwOk);
+ 
+  if (!emailOk || !pwOk) return;
+ 
+  /* Show loading */
+  const btn = document.getElementById('loginBtn');
+  btn.classList.add('loading');
+ 
+  setTimeout(() => {
+    btn.classList.remove('loading');
+    showSuccess();
+  }, 1800);
+}
+ 
+/* ── Success ── */
+function showSuccess() {
+  const overlay = document.getElementById('successOverlay');
+  overlay.classList.add('show');
+  /* animate progress bar */
+  setTimeout(() => {
+    document.getElementById('progressFill').style.width = '100%';
+  }, 80);
+  /* simulate redirect */
+  setTimeout(() => {
+    window.location.href = 'foodeiblog-admin.html';
+  }, 2200);
+}
+ 
+/* ── Forgot modal ── */
+function showForgot() {
+  document.getElementById('forgotModal').style.display = 'grid';
+}
+function closeForgot() {
+  document.getElementById('forgotModal').style.display = 'none';
+}
+function sendReset() {
+  closeForgot();
+  /* tiny toast */
+  const toast = document.createElement('div');
+  toast.textContent = '📧 Reset link sent to your email!';
+  Object.assign(toast.style, {
+    position:'fixed', bottom:'28px', left:'50%', transform:'translateX(-50%)',
+    background: 'var(--espresso)', color:'var(--cream)',
+    padding:'12px 24px', borderRadius:'40px',
+    fontSize:'13px', fontWeight:'600',
+    boxShadow:'0 8px 32px rgba(44,26,14,.3)',
+    zIndex:'9999',
+    animation:'floatIn .35s ease both',
+    fontFamily:"'Outfit',sans-serif",
+  });
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 3500);
+}
+ 
+/* ── Enter key support ── */
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter') handleLogin();
+});
+ 
+/* ── Real-time validation ── */
+document.getElementById('emailInput').addEventListener('blur', function() {
+  if (this.value) setError('emailWrap', 'emailErr', !validateEmail(this.value.trim()));
+});
+document.getElementById('pwInput').addEventListener('blur', function() {
+  if (this.value) setError('pwWrap', 'pwErr', !validatePw(this.value));
+});
+ 
+/* ── Close modal on outside click ── */
+document.getElementById('forgotModal').addEventListener('click', function(e) {
+  if (e.target === this) closeForgot();
+});
+</script>
+</body>
+</html>
