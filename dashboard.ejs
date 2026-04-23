@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Canteen Admin Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg:        #1a1108;
+    --bg2:       #231a0d;
+    --bg3:       #2e2010;
+    --panel:     #2a1e0e;
+    --border:    #3d2d18;
+    --gold:      #c9963a;
+    --gold-lt:   #e8b86d;
+    --cream:     #f5ead8;
+    --text:      #ede0c8;
+    --muted:     #8a7660;
+    --green:     #5a8a4a;
+    --red:       #a04030;
+    --blue:      #3a6898;
+    --accent:    #d4823a;
+  }
+ 
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+ 
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    overflow-x: hidden;
+  }
+ 
+  /* ── Sidebar ── */
+  .sidebar {
+    width: 240px;
+    min-height: 100vh;
+    background: var(--panel);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 0; left: 0;
+    z-index: 100;
+  }
+ 
+  .logo {
+    padding: 28px 24px 20px;
+    border-bottom: 1px solid var(--border);
+  }
+  .logo-icon {
+    width: 40px; height: 40px;
+    background: linear-gradient(135deg, var(--gold), var(--accent));
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; margin-bottom: 10px;
+  }
+  .logo-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px;
+    color: var(--cream);
+    letter-spacing: 0.02em;
+  }
+  .logo-sub {
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-top: 2px;
+  }
+ 
+  .nav { padding: 16px 12px; flex: 1; }
+  .nav-section-label {
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    color: var(--muted);
+    text-transform: uppercase;
+    padding: 0 12px;
+    margin: 16px 0 6px;
+  }
+ 
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    color: var(--muted);
+    font-size: 13.5px;
+    font-weight: 500;
+    transition: all 0.2s;
+    text-decoration: none;
+    margin-bottom: 2px;
+  }
+  .nav-item:hover { background: var(--bg3); color: var(--text); }
+  .nav-item.active {
+    background: linear-gradient(90deg, rgba(201,150,58,.18), transparent);
+    color: var(--gold-lt);
+    border-left: 2px solid var(--gold);
+  }
+  .nav-item .icon { width: 18px; text-align: center; font-size: 15px; }
+  .nav-badge {
+    margin-left: auto;
+    background: var(--red);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 6px;
+    border-radius: 10px;
+  }
+ 
+  .sidebar-footer {
+    padding: 16px;
+    border-top: 1px solid var(--border);
+  }
+  .admin-card {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    background: var(--bg3);
+    border-radius: 10px;
+  }
+  .admin-avatar {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--gold), var(--accent));
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 13px;
+    color: var(--bg);
+    flex-shrink: 0;
+  }
+  .admin-name { font-size: 12.5px; font-weight: 600; color: var(--cream); }
+  .admin-role { font-size: 10px; color: var(--muted); }
+ 
+  /* ── Main ── */
+  .main { margin-left: 240px; flex: 1; display: flex; flex-direction: column; }
+ 
+  .topbar {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 18px 32px;
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    position: sticky; top: 0; z-index: 50;
+  }
+  .topbar-left h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    color: var(--cream);
+  }
+  .topbar-left p { font-size: 12px; color: var(--muted); margin-top: 2px; }
+ 
+  .topbar-right { display: flex; align-items: center; gap: 12px; }
+  .search-box {
+    display: flex; align-items: center; gap: 8px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 7px 14px;
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .search-box input {
+    background: none; border: none; outline: none;
+    color: var(--text); font-size: 13px; width: 160px;
+  }
+  .search-box input::placeholder { color: var(--muted); }
+ 
+  .icon-btn {
+    width: 36px; height: 36px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; font-size: 16px;
+    position: relative;
+    transition: background 0.2s;
+  }
+  .icon-btn:hover { background: var(--bg3); }
+  .notif-dot {
+    position: absolute; top: 6px; right: 6px;
+    width: 7px; height: 7px;
+    background: var(--gold);
+    border-radius: 50%;
+    border: 1.5px solid var(--bg2);
+  }
+ 
+  /* ── Content ── */
+  .content { padding: 28px 32px; flex: 1; }
+ 
+  /* ── Stats Row ── */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+  .stat-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s, border-color 0.2s;
+  }
+  .stat-card:hover { transform: translateY(-2px); border-color: var(--gold); }
+  .stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0; right: 0;
+    width: 80px; height: 80px;
+    border-radius: 50%;
+    opacity: 0.08;
+    transform: translate(20px, -20px);
+  }
+  .stat-card.c1::before { background: var(--gold); }
+  .stat-card.c2::before { background: var(--green); }
+  .stat-card.c3::before { background: var(--blue); }
+  .stat-card.c4::before { background: var(--accent); }
+ 
+  .stat-icon {
+    width: 40px; height: 40px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    margin-bottom: 14px;
+  }
+  .c1 .stat-icon { background: rgba(201,150,58,.15); }
+  .c2 .stat-icon { background: rgba(90,138,74,.15); }
+  .c3 .stat-icon { background: rgba(58,104,152,.15); }
+  .c4 .stat-icon { background: rgba(212,130,58,.15); }
+ 
+  .stat-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; }
+  .stat-value {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    color: var(--cream);
+    margin: 4px 0 6px;
+    line-height: 1;
+  }
+  .stat-change {
+    font-size: 11px;
+    display: flex; align-items: center; gap: 4px;
+  }
+  .up { color: var(--green); }
+  .down { color: var(--red); }
+ 
+  /* ── Mid Row ── */
+  .mid-grid {
+    display: grid;
+    grid-template-columns: 1.6fr 1fr;
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+ 
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 22px;
+  }
+  .card-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 18px;
+  }
+  .card-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 16px;
+    color: var(--cream);
+  }
+  .card-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .view-all {
+    font-size: 12px;
+    color: var(--gold);
+    cursor: pointer;
+    text-decoration: none;
+  }
+  .view-all:hover { color: var(--gold-lt); }
+ 
+  /* Orders Table */
+  .orders-table { width: 100%; border-collapse: collapse; }
+  .orders-table th {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: 0 0 10px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+  .orders-table td {
+    padding: 12px 0;
+    font-size: 13px;
+    border-bottom: 1px solid rgba(61,45,24,.5);
+    vertical-align: middle;
+  }
+  .orders-table tr:last-child td { border: none; }
+ 
+  .order-item-name { font-weight: 500; color: var(--cream); font-size: 13px; }
+  .order-item-sub  { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .food-dot {
+    display: inline-block; width: 8px; height: 8px;
+    border-radius: 50%; margin-right: 6px;
+    flex-shrink: 0;
+  }
+ 
+  .badge {
+    display: inline-flex; align-items: center;
+    padding: 3px 9px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+  .badge-green  { background: rgba(90,138,74,.18);  color: #7ec96e; }
+  .badge-amber  { background: rgba(201,150,58,.18); color: var(--gold-lt); }
+  .badge-red    { background: rgba(160,64,48,.18);  color: #e07060; }
+  .badge-blue   { background: rgba(58,104,152,.18); color: #7ab0e0; }
+ 
+  /* Popular Items */
+  .menu-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(61,45,24,.5);
+  }
+  .menu-item:last-child { border: none; }
+  .menu-emoji {
+    width: 40px; height: 40px;
+    background: var(--bg3);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+  .menu-info { flex: 1; }
+  .menu-name { font-size: 13px; font-weight: 500; color: var(--cream); }
+  .menu-cat  { font-size: 11px; color: var(--muted); }
+  .menu-sales { text-align: right; }
+  .menu-sales-val { font-size: 14px; font-weight: 600; color: var(--gold-lt); }
+  .menu-bar-wrap { width: 60px; height: 4px; background: var(--bg3); border-radius: 2px; margin-top: 4px; margin-left: auto; }
+  .menu-bar { height: 100%; background: linear-gradient(90deg, var(--gold), var(--accent)); border-radius: 2px; }
+ 
+  /* ── Bottom Row ── */
+  .bottom-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 16px;
+  }
+ 
+  /* Donut Chart  */
+  .donut-wrap { display: flex; flex-direction: column; align-items: center; padding: 4px 0 8px; }
+  .donut-svg { margin-bottom: 16px; }
+  .donut-legend { display: flex; flex-direction: column; gap: 8px; width: 100%; }
+  .legend-row { display: flex; align-items: center; gap: 8px; }
+  .legend-dot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+  .legend-label { font-size: 12px; color: var(--muted); flex: 1; }
+  .legend-val { font-size: 12px; font-weight: 600; color: var(--cream); }
+ 
+  /* Staff */
+  .staff-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 9px 0;
+    border-bottom: 1px solid rgba(61,45,24,.5);
+  }
+  .staff-item:last-child { border: none; }
+  .staff-av {
+    width: 34px; height: 34px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700;
+    flex-shrink: 0;
+  }
+  .staff-name { font-size: 13px; font-weight: 500; color: var(--cream); }
+  .staff-role { font-size: 11px; color: var(--muted); }
+  .staff-status { margin-left: auto; }
+ 
+  /* Quick Actions */
+  .actions-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .action-btn {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 12px;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.2s;
+    display: flex; flex-direction: column; gap: 6px;
+  }
+  .action-btn:hover { border-color: var(--gold); background: rgba(201,150,58,.06); }
+  .action-btn .a-icon { font-size: 20px; }
+  .action-btn .a-label { font-size: 12px; font-weight: 600; color: var(--cream); }
+  .action-btn .a-sub  { font-size: 10px; color: var(--muted); }
+ 
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+ 
+  /* Chart bars */
+  .chart-container { display: flex; align-items: flex-end; gap: 6px; height: 80px; margin-top: 8px; }
+  .bar-col { display: flex; flex-direction: column; align-items: center; gap: 4px; flex: 1; }
+  .bar {
+    width: 100%; border-radius: 4px 4px 0 0;
+    background: linear-gradient(180deg, var(--gold), var(--accent));
+    opacity: 0.7;
+    transition: opacity 0.2s;
+    min-height: 4px;
+  }
+  .bar.active { opacity: 1; }
+  .bar:hover { opacity: 1; }
+  .bar-lbl { font-size: 9px; color: var(--muted); }
+</style>
+</head>
+<body>
+ 
+<!-- ══════════════ SIDEBAR ══════════════ -->
+<aside class="sidebar">
+  <div class="logo">
+    <div class="logo-icon">🍽️</div>
+    <div class="logo-name">CanteenPro</div>
+    <div class="logo-sub">Admin Dashboard</div>
+  </div>
+ 
+  <nav class="nav">
+    <div class="nav-section-label">Main</div>
+    <a class="nav-item active" href="#">
+      <span class="icon">📊</span> Overview
+    </a>
+    <a class="nav-item" href="/admin/orders">
+      <span class="icon">🧾</span> Orders
+      <span class="nav-badge">12</span>
+    </a>
+    <a class="nav-item" href="/admin/menu-items">
+      <span class="icon">🍱</span> Menu Items
+    </a>
+    <a class="nav-item" href="/admin/inventory">
+      <span class="icon">📦</span> Inventory
+      <span class="nav-badge">3</span>
+    </a>
+ 
+    <div class="nav-section-label">Management</div>
+    <a class="nav-item" href="/admin/staff">
+      <span class="icon">👩‍🍳</span> Staff
+    </a>
+    <a class="nav-item" href="#">
+      <span class="icon">🪑</span> Tables
+    </a>
+    <a class="nav-item" href="#">
+      <span class="icon">💳</span> Payments
+    </a>
+    <a class="nav-item" href="#">
+      <span class="icon">📣</span> Promotions
+    </a>
+ 
+    <div class="nav-section-label">Reports</div>
+    <a class="nav-item" href="#">
+      <span class="icon">📈</span> Analytics
+    </a>
+    <a class="nav-item" href="#">
+      <span class="icon">⭐</span> Reviews
+    </a>
+    <a class="nav-item" href="#">
+      <span class="icon">⚙️</span> Settings
+    </a>
+  </nav>
+ 
+  <div class="sidebar-footer">
+    <div class="admin-card">
+      <div class="admin-avatar">AK</div>
+      <div>
+        <div class="admin-name">Ananya Krishnan</div>
+        <div class="admin-role">Super Admin</div>
+      </div>
+    </div>
+  </div>
+</aside>
+ 
+<!-- ══════════════ MAIN ══════════════ -->
+<main class="main">
+ 
+  <!-- Topbar -->
+  <div class="topbar">
+    <div class="topbar-left">
+      <h1>Good morning, Ananya 👋</h1>
+      <p>Tuesday, 24 March 2026 · Lunch service starts in 1h 32m</p>
+    </div>
+    <div class="topbar-right">
+      <div class="search-box">
+        <span>🔍</span>
+        <input type="text" placeholder="Search orders, items…"/>
+      </div>
+      <div class="icon-btn">
+        🔔
+        <span class="notif-dot"></span>
+      </div>
+      <div class="icon-btn">💬</div>
+    </div>
+  </div>
+ 
+  <!-- Content -->
+  <div class="content">
+ 
+    <!-- Stats -->
+    <div class="stats-grid">
+      <div class="stat-card c1">
+        <div class="stat-icon">💰</div>
+        <div class="stat-label">Today's Revenue</div>
+        <div class="stat-value">₹18,420</div>
+        <div class="stat-change up">▲ 12.4% vs yesterday</div>
+      </div>
+      <div class="stat-card c2">
+        <div class="stat-icon">🧾</div>
+        <div class="stat-label">Total Orders</div>
+        <div class="stat-value">284</div>
+        <div class="stat-change up">▲ 8.1% vs yesterday</div>
+      </div>
+      <div class="stat-card c3">
+        <div class="stat-icon">👥</div>
+        <div class="stat-label">Customers Served</div>
+        <div class="stat-value">211</div>
+        <div class="stat-change down">▼ 2.3% vs yesterday</div>
+      </div>
+      <div class="stat-card c4">
+        <div class="stat-icon">🍽️</div>
+        <div class="stat-label">Avg Order Value</div>
+        <div class="stat-value">₹64.8</div>
+        <div class="stat-change up">▲ 5.7% vs yesterday</div>
+      </div>
+    </div>
+ 
+    <!-- Mid Row -->
+    <div class="mid-grid">
+ 
+      <!-- Recent Orders -->
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Recent Orders</div>
+            <div class="card-sub">Live feed of today's orders</div>
+          </div>
+          <a class="view-all" href="#">View all →</a>
+        </div>
+        <table class="orders-table">
+          <thead>
+            <tr>
+              <th>Order</th>
+              <th>Customer</th>
+              <th>Items</th>
+              <th>Amount</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="color:var(--muted);font-size:12px;">#0284</td>
+              <td>
+                <div class="order-item-name">Rahul M.</div>
+                <div class="order-item-sub">Table 4 · 1:12 PM</div>
+              </td>
+              <td style="color:var(--text);font-size:13px;">Paneer Butter Masala ×2</td>
+              <td style="color:var(--gold-lt);font-weight:600;">₹340</td>
+              <td><span class="badge badge-green">✓ Ready</span></td>
+            </tr>
+            <tr>
+              <td style="color:var(--muted);font-size:12px;">#0283</td>
+              <td>
+                <div class="order-item-name">Sneha K.</div>
+                <div class="order-item-sub">Takeaway · 1:08 PM</div>
+              </td>
+              <td style="color:var(--text);font-size:13px;">Veg Biryani, Raita</td>
+              <td style="color:var(--gold-lt);font-weight:600;">₹180</td>
+              <td><span class="badge badge-amber">⏳ Cooking</span></td>
+            </tr>
+            <tr>
+              <td style="color:var(--muted);font-size:12px;">#0282</td>
+              <td>
+                <div class="order-item-name">Arjun S.</div>
+                <div class="order-item-sub">Table 7 · 1:05 PM</div>
+              </td>
+              <td style="color:var(--text);font-size:13px;">Masala Dosa ×3, Coffee</td>
+              <td style="color:var(--gold-lt);font-weight:600;">₹285</td>
+              <td><span class="badge badge-blue">🛵 Delivering</span></td>
+            </tr>
+            <tr>
+              <td style="color:var(--muted);font-size:12px;">#0281</td>
+              <td>
+                <div class="order-item-name">Priya R.</div>
+                <div class="order-item-sub">Counter · 12:58 PM</div>
+              </td>
+              <td style="color:var(--text);font-size:13px;">Chole Bhature</td>
+              <td style="color:var(--gold-lt);font-weight:600;">₹120</td>
+              <td><span class="badge badge-green">✓ Served</span></td>
+            </tr>
+            <tr>
+              <td style="color:var(--muted);font-size:12px;">#0280</td>
+              <td>
+                <div class="order-item-name">Kiran D.</div>
+                <div class="order-item-sub">Table 2 · 12:52 PM</div>
+              </td>
+              <td style="color:var(--text);font-size:13px;">Dal Makhani, Naan ×2</td>
+              <td style="color:var(--gold-lt);font-weight:600;">₹220</td>
+              <td><span class="badge badge-red">✗ Cancelled</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+ 
+      <!-- Popular Items -->
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Top Menu Items</div>
+            <div class="card-sub">Today's bestsellers</div>
+          </div>
+          <a class="view-all" href="#">Manage →</a>
+        </div>
+ 
+        <div class="menu-item">
+          <div class="menu-emoji">🍛</div>
+          <div class="menu-info">
+            <div class="menu-name">Paneer Butter Masala</div>
+            <div class="menu-cat">Main Course</div>
+          </div>
+          <div class="menu-sales">
+            <div class="menu-sales-val">48 sold</div>
+            <div class="menu-bar-wrap"><div class="menu-bar" style="width:100%"></div></div>
+          </div>
+        </div>
+        <div class="menu-item">
+          <div class="menu-emoji">🫓</div>
+          <div class="menu-info">
+            <div class="menu-name">Masala Dosa</div>
+            <div class="menu-cat">Breakfast</div>
+          </div>
+          <div class="menu-sales">
+            <div class="menu-sales-val">41 sold</div>
+            <div class="menu-bar-wrap"><div class="menu-bar" style="width:85%"></div></div>
+          </div>
+        </div>
+        <div class="menu-item">
+          <div class="menu-emoji">🍚</div>
+          <div class="menu-info">
+            <div class="menu-name">Veg Biryani</div>
+            <div class="menu-cat">Main Course</div>
+          </div>
+          <div class="menu-sales">
+            <div class="menu-sales-val">37 sold</div>
+            <div class="menu-bar-wrap"><div class="menu-bar" style="width:77%"></div></div>
+          </div>
+        </div>
+        <div class="menu-item">
+          <div class="menu-emoji">☕</div>
+          <div class="menu-info">
+            <div class="menu-name">Filter Coffee</div>
+            <div class="menu-cat">Beverages</div>
+          </div>
+          <div class="menu-sales">
+            <div class="menu-sales-val">62 sold</div>
+            <div class="menu-bar-wrap"><div class="menu-bar" style="width:100%"></div></div>
+          </div>
+        </div>
+        <div class="menu-item">
+          <div class="menu-emoji">🫔</div>
+          <div class="menu-info">
+            <div class="menu-name">Chole Bhature</div>
+            <div class="menu-cat">Snacks</div>
+          </div>
+          <div class="menu-sales">
+            <div class="menu-sales-val">29 sold</div>
+            <div class="menu-bar-wrap"><div class="menu-bar" style="width:60%"></div></div>
+          </div>
+        </div>
+      </div>
+ 
+    </div>
+ 
+    <!-- Bottom Row -->
+    <div class="bottom-grid">
+ 
+      <!-- Revenue Chart -->
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Weekly Revenue</div>
+            <div class="card-sub">Mon – Sun · ₹ in thousands</div>
+          </div>
+          <span style="font-size:11px;color:var(--gold);">This week</span>
+        </div>
+        <div class="chart-container">
+          <div class="bar-col">
+            <div class="bar" style="height:52px;"></div>
+            <div class="bar-lbl">Mon</div>
+          </div>
+          <div class="bar-col">
+            <div class="bar" style="height:68px;"></div>
+            <div class="bar-lbl">Tue</div>
+          </div>
+          <div class="bar-col">
+            <div class="bar" style="height:44px;"></div>
+            <div class="bar-lbl">Wed</div>
+          </div>
+          <div class="bar-col">
+            <div class="bar" style="height:76px;"></div>
+            <div class="bar-lbl">Thu</div>
+          </div>
+          <div class="bar-col">
+            <div class="bar" style="height:60px;"></div>
+            <div class="bar-lbl">Fri</div>
+          </div>
+          <div class="bar-col">
+            <div class="bar active" style="height:80px;"></div>
+            <div class="bar-lbl" style="color:var(--gold);">Sat</div>
+          </div>
+          <div class="bar-col">
+            <div class="bar" style="height:34px;opacity:0.35;"></div>
+            <div class="bar-lbl">Sun</div>
+          </div>
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-top:14px;">
+          <div>
+            <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;">Week Total</div>
+            <div style="font-family:'Playfair Display',serif;font-size:20px;color:var(--cream);margin-top:2px;">₹1,14,820</div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;">vs Last Week</div>
+            <div style="font-size:16px;color:#7ec96e;margin-top:2px;">▲ 9.2%</div>
+          </div>
+        </div>
+      </div>
+ 
+      <!-- Category Donut -->
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Sales by Category</div>
+            <div class="card-sub">Today's breakdown</div>
+          </div>
+        </div>
+        <div class="donut-wrap">
+          <svg class="donut-svg" width="120" height="120" viewBox="0 0 120 120">
+            <!-- donut segments via stroke-dasharray -->
+            <circle cx="60" cy="60" r="45" fill="none" stroke="var(--bg3)" stroke-width="18"/>
+            <!-- Main: 38% -->
+            <circle cx="60" cy="60" r="45" fill="none" stroke="var(--gold)" stroke-width="18"
+              stroke-dasharray="107.5 175.5" stroke-dashoffset="0" transform="rotate(-90 60 60)"/>
+            <!-- Snacks: 24% -->
+            <circle cx="60" cy="60" r="45" fill="none" stroke="var(--accent)" stroke-width="18"
+              stroke-dasharray="67.9 215.1" stroke-dashoffset="-107.5" transform="rotate(-90 60 60)"/>
+            <!-- Beverages: 20% -->
+            <circle cx="60" cy="60" r="45" fill="none" stroke="var(--blue)" stroke-width="18"
+              stroke-dasharray="56.5 226.5" stroke-dashoffset="-175.4" transform="rotate(-90 60 60)"/>
+            <!-- Desserts: 18% -->
+            <circle cx="60" cy="60" r="45" fill="none" stroke="#6a8a5a" stroke-width="18"
+              stroke-dasharray="50.9 232.1" stroke-dashoffset="-231.9" transform="rotate(-90 60 60)"/>
+            <text x="60" y="56" text-anchor="middle" fill="var(--cream)" font-family="Playfair Display,serif" font-size="16">284</text>
+            <text x="60" y="70" text-anchor="middle" fill="var(--muted)" font-family="DM Sans,sans-serif" font-size="9">orders</text>
+          </svg>
+          <div class="donut-legend">
+            <div class="legend-row"><div class="legend-dot" style="background:var(--gold)"></div><div class="legend-label">Main Course</div><div class="legend-val">38%</div></div>
+            <div class="legend-row"><div class="legend-dot" style="background:var(--accent)"></div><div class="legend-label">Snacks</div><div class="legend-val">24%</div></div>
+            <div class="legend-row"><div class="legend-dot" style="background:var(--blue)"></div><div class="legend-label">Beverages</div><div class="legend-val">20%</div></div>
+            <div class="legend-row"><div class="legend-dot" style="background:#6a8a5a"></div><div class="legend-label">Desserts</div><div class="legend-val">18%</div></div>
+          </div>
+        </div>
+      </div>
+ 
+      <!-- Quick Actions & Staff -->
+      <div style="display:flex;flex-direction:column;gap:16px;">
+ 
+        <div class="card" style="padding:18px;">
+          <div class="card-header">
+            <div class="card-title">Quick Actions</div>
+          </div>
+          <div class="actions-grid">
+            <button class="action-btn" onclick="window.location.href='/Additems'">
+              <span class="a-icon">➕</span>
+              <span class="a-label">Add Item  </span>
+              <span class="a-sub">New menu entry</span>
+            </button>
+            <button class="action-btn" onclick="window.location.href='/admin/orders'">
+              <span class="a-icon">📋</span>
+              <span class="a-label">New Order</span>
+              <span class="a-sub">Manual entry</span>
+            </button>
+            <button class="action-btn" onclick="window.location.href='/admin/inventory'">
+
+  <span class="a-icon">📦</span>
+
+  <span class="a-label">Stock Alert</span>
+
+  <span class="a-sub">
+    <%= lowStockItems.length %> items low
+  </span>
+
+</button>
+            <button class="action-btn">
+              <span class="a-icon">🖨️</span>
+              <span class="a-label">Print Report</span>
+              <span class="a-sub">Daily summary</span>
+            </button>
+          </div>
+        </div>
+ 
+        <div class="card" style="padding:18px;">
+          <div class="card-header">
+            <div class="card-title">Staff on Duty</div>
+          </div>
+          <div class="staff-item">
+            <div class="staff-av" style="background:rgba(201,150,58,.2);color:var(--gold-lt);">RS</div>
+            <div>
+              <div class="staff-name">Rajan Singh</div>
+              <div class="staff-role">Head Chef</div>
+            </div>
+            <div class="staff-status"><span class="badge badge-green">On duty</span></div>
+          </div>
+          <div class="staff-item">
+            <div class="staff-av" style="background:rgba(58,104,152,.2);color:#7ab0e0;">MV</div>
+            <div>
+              <div class="staff-name">Meena Varma</div>
+              <div class="staff-role">Cashier</div>
+            </div>
+            <div class="staff-status"><span class="badge badge-green">On duty</span></div>
+          </div>
+          <div class="staff-item">
+            <div class="staff-av" style="background:rgba(160,64,48,.2);color:#e07060;">PK</div>
+            <div>
+              <div class="staff-name">Prakash Kumar</div>
+              <div class="staff-role">Server</div>
+            </div>
+            <div class="staff-status"><span class="badge badge-amber">Break</span></div>
+          </div>
+        </div>
+ 
+      </div>
+    </div>
+ 
+  </div><!-- /content -->
+</main>
+ 
+</body>
+</html>

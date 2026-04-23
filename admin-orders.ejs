@@ -1,0 +1,133 @@
+<style>
+  .orders-container {
+    padding: 30px;
+    background: #1a1108;
+    color: #ede0c8;
+    min-height: 100vh;
+  }
+
+  .orders-title {
+    font-size: 26px;
+    font-family: 'Playfair Display', serif;
+    margin-bottom: 20px;
+  }
+
+  .orders-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #2a1e0e;
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .orders-table th {
+    text-align: left;
+    padding: 14px;
+    font-size: 12px;
+    text-transform: uppercase;
+    color: #8a7660;
+    border-bottom: 1px solid #3d2d18;
+  }
+
+  .orders-table td {
+    padding: 14px;
+    border-bottom: 1px solid rgba(61,45,24,.5);
+    font-size: 14px;
+  }
+
+  .orders-table tr:hover {
+    background: #231a0d;
+  }
+
+  .amount {
+    color: #e8b86d;
+    font-weight: 600;
+  }
+
+  .badge {
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  .pending { background: rgba(201,150,58,.2); color: #e8b86d; }
+  .ready { background: rgba(90,138,74,.2); color: #7ec96e; }
+  .cancelled { background: rgba(160,64,48,.2); color: #e07060; }
+
+  .status-select {
+    background: #2e2010;
+    color: #fff;
+    border: 1px solid #3d2d18;
+    padding: 6px;
+    border-radius: 6px;
+  }
+
+  .update-btn {
+    padding: 6px 12px;
+    background: #c9963a;
+    border: none;
+    color: #1a1108;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+  }
+
+  .update-btn:hover {
+    background: #e8b86d;
+  }
+</style>
+
+<div class="orders-container">
+
+  <div class="orders-title">📦 All Orders</div>
+
+  <table class="orders-table">
+    <thead>
+      <tr>
+        <th>#ID</th>
+        <th>User</th>
+        <th>Total</th>
+        <th>Status</th>
+        <th>Date</th>
+        <th>Update</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <% orders.forEach(order => { %>
+        <tr>
+          <td>#<%= order.id %></td>
+          <td>User <%= order.user_id %></td>
+          <td class="amount">₹ <%= order.total_amount %></td>
+
+          <td>
+            <span class="badge <%= order.status.toLowerCase() %>">
+              <%= order.status %>
+            </span>
+          </td>
+
+          <td><%= new Date(order.created_at).toLocaleString() %></td>
+
+          <td>
+            <form action="/admin/update-status" method="POST">
+              <input type="hidden" name="orderId" value="<%= order.id %>">
+
+              <select name="status" class="status-select">
+                <option value="Pending">Pending</option>
+                <option value="Cooking">Cooking</option>
+                <option value="Ready">Ready</option>
+                <option value="Delivered">Delivered</option>
+                <option value="Cancelled">Cancelled</option>
+              </select>
+
+              <button class="update-btn">Update</button>
+            </form>
+          </td>
+        </tr>
+      <% }) %>
+    </tbody>
+
+  </table>
+
+</div>
